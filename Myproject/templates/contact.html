@@ -1,0 +1,71 @@
+{%load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contact Form + Map</title>
+  <link rel="stylesheet" href="{% static 'css/contact.css' %}" />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet"/>
+</head>
+<body>
+  <h2 class="title">Contact</h2>
+
+  <section class="contact-box">
+    <!-- left: form -->
+    <div class="form-side">
+      <h3>Contact Us</h3>
+
+      <form id="contactForm">
+        <label>Full Name</label>
+        <input type="text" placeholder="Name" required />
+
+        <label>Email Address</label>
+        <input type="email" placeholder="Email" required />
+
+        <label>Subject</label>
+        <input type="text" placeholder="Subject" required />
+
+        <label>Message</label>
+        <textarea placeholder="Message" required></textarea>
+
+        <button type="submit">Send Message</button>
+        <p id="status"></p>
+      </form>
+    </div>
+
+    <!-- right: embedded Google map -->
+    <div id="mapBox" class="map-side">
+      <iframe
+        title="Google map"
+        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d24156.85654373623!2d-74.02667504968586!3d40.730868353069796!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89c259af1800d4af%3A0xca1dad5a64e6bfa9!2sChelsea%2C%20New%20York%2C%20NY!5e0!3m2!1sen!2sus!4v1699672106537!5m2!1sen!2sus"
+        allowfullscreen=""
+        loading="lazy"
+        referrerpolicy="no-referrer-when-downgrade">
+      </iframe>
+    </div>
+  </section>
+
+  <!-- info strip -->
+  <footer class="info-strip">
+    <div class="info">
+      <span class="icon">📍</span>
+      Address: 198 West 21th Street, Suite 721 New York NY 10016
+    </div>
+    <div class="info">
+      <span class="icon">☎️</span>
+      Phone: <a href="tel:+1235235598">+ 1235 2355 98</a>
+    </div>
+    <div class="info">
+      <span class="icon">✉️</span>
+      Email: <a href="mailto:info@yoursite.com">info@yoursite.com</a>
+    </div>
+    <div class="info">
+      <span class="icon">🌐</span>
+      Website <a href="https://yoursite.com">yoursite.com</a>
+    </div>
+  </footer>
+
+  <script src="{% static 'javascript/contact.js' %}"></script>
+</body>
+</html>

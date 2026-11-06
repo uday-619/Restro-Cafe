@@ -1,0 +1,118 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>la cafe' - Menu</title>
+
+  <!-- main stylesheet -->
+  <link rel="stylesheet" href="{% static 'css/style1.css' %}" />
+
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <!-- CSRF Token for AJAX ordering -->
+  {% csrf_token %}
+
+  <!-- custom cursors -->
+  <div id="cursor"></div>
+  <div id="cursor-trail"></div>
+
+  <div class="menu-container">
+    <h1>MENU</h1>
+    <p class="desc">
+      123 Southern Park · Joseph Lane · Boston MA 60008<br />
+      Open 8 am – 8 pm   |   Order online at www.menu.com
+    </p>
+
+    <div class="menu-columns">
+      <!-- ▸ COFFEE DRINKS -->
+      <div class="column">
+        <h2>COFFEE DRINKS</h2>
+        <ul>
+          {% for item in coffees %}
+            <div class="food-item" data-img="{% static item.image_url %}" data-id="{{ item.id }}">
+              <li>{{ item.name }} <span>{{ item.price }}</span></li>
+              <button class="order-btn">Order</button>
+              <button class="view-btn">View</button>
+            </div>
+          {% endfor %}
+        </ul>
+      </div>
+
+      <!-- ▸ SALADS -->
+      <div class="column">
+        <h2>SALADS</h2>
+        <ul>
+          {% for item in salads %}
+            <div class="food-item" data-img="{% static item.image_url %}" data-id="{{ item.id }}">
+              <li>{{ item.name }} <span>{{ item.price }}</span></li>
+              <button class="order-btn">Order</button>
+              <button class="view-btn">View</button>
+            </div>
+          {% endfor %}
+        </ul>
+      </div>
+
+      <!-- ▸ SOUPS -->
+      <div class="column">
+        <h2>SOUPS</h2>
+        <ul>
+          {% for item in soups %}
+            <div class="food-item" data-img="{% static item.image_url %}" data-id="{{ item.id }}">
+              <li>{{ item.name }} <span>{{ item.price }}</span></li>
+              <button class="order-btn">Order</button>
+              <button class="view-btn">View</button>
+            </div>
+          {% endfor %}
+        </ul>
+      </div>
+
+      <!-- ▸ DESSERTS -->
+      <div class="column">
+        <h2>DESSERTS</h2>
+        <ul>
+          {% for item in desserts %}
+            <div class="food-item" data-img="{% static item.image_url %}" data-id="{{ item.id }}">
+              <li>{{ item.name }} <span>{{ item.price }}</span></li>
+              <button class="order-btn">Order</button>
+              <button class="view-btn">View</button>
+            </div>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+
+    <!-- Active Orders / Order History Log -->
+    {% if user.is_authenticated and user_orders %}
+      <div class="order-history-section">
+        <h2>YOUR ORDER HISTORY</h2>
+        <div class="order-history-list">
+          {% for order in user_orders %}
+            <div class="order-history-card">
+              <span class="order-item-name">{{ order.item.name }}</span>
+              <span class="order-item-price">${{ order.item.price }}</span>
+              <span class="order-item-date">{{ order.created_at|date:"d M Y, H:i" }}</span>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
+
+    <div class="contact">
+      <p>To place an order call&nbsp;&nbsp;<strong>(555) 123‑4567</strong></p>
+      <p>145 Western Street · Sunflower Town</p>
+    </div>
+  </div>
+
+  <!-- image modal -->
+  <div id="image-modal">
+    <span id="close-modal">&times;</span>
+    <img id="modal-img" src="" alt="Food preview" />
+  </div>
+
+  <script src="{% static 'javascript/script1.js' %}"></script>
+</body>
+</html>

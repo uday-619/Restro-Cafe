@@ -1,0 +1,114 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Café Seat Reservation</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{% static 'css/reserve.css' %}" />
+</head>
+<body>
+  <div class="wrapper">
+    <h1>Café Seat Reservation</h1>
+    <div class="legend">
+      <span><span class="seat free"></span>Free</span>
+      <span><span class="seat selected"></span>Selected</span>
+      <span><span class="seat taken"></span>Reserved</span>
+    </div>
+
+    <div id="map" class="map">
+      <!-- First row (top row of small tables) -->
+      <div data-id="A1" class="seat free R1 C1"></div>
+      <div data-id="A2" class="seat free R1 C2"></div>
+      <div data-id="A3" class="seat free R1 C3"></div>
+      <div data-id="A4" class="seat free R1 C4"></div>
+      <div data-id="A5" class="seat free R1 C5"></div>
+      <div data-id="A6" class="seat free R1 C6"></div>
+
+      <!-- Main area: 4 seats per table, multiple tables -->
+      <!-- Repeat this block for each table row and column -->
+      <!-- Each table is 2x2 (e.g., R2C1, R2C2, R3C1, R3C2 for one table) -->
+      <!-- 4 columns x 3 rows = 12 tables -->
+      <!-- First row of tables -->
+      <div data-id="T1" class="seat free R2 C1"></div>
+      <div data-id="T2" class="seat free R2 C2"></div>
+      <div data-id="T3" class="seat free R3 C1"></div>
+      <div data-id="T4" class="seat free R3 C2"></div>
+
+      <div data-id="T5" class="seat free R2 C3"></div>
+      <div data-id="T6" class="seat free R2 C4"></div>
+      <div data-id="T7" class="seat free R3 C3"></div>
+      <div data-id="T8" class="seat free R3 C4"></div>
+
+      <div data-id="T9" class="seat free R2 C5"></div>
+      <div data-id="T10" class="seat free R2 C6"></div>
+      <div data-id="T11" class="seat free R3 C5"></div>
+      <div data-id="T12" class="seat free R3 C6"></div>
+
+      <div data-id="T13" class="seat free R2 C7"></div>
+      <div data-id="T14" class="seat free R2 C8"></div>
+      <div data-id="T15" class="seat free R3 C7"></div>
+      <div data-id="T16" class="seat free R3 C8"></div>
+
+      <!-- Second row of tables -->
+      <div data-id="T17" class="seat free R4 C1"></div>
+      <div data-id="T18" class="seat free R4 C2"></div>
+      <div data-id="T19" class="seat free R5 C1"></div>
+      <div data-id="T20" class="seat free R5 C2"></div>
+
+      <div data-id="T21" class="seat free R4 C3"></div>
+      <div data-id="T22" class="seat free R4 C4"></div>
+      <div data-id="T23" class="seat free R5 C3"></div>
+      <div data-id="T24" class="seat free R5 C4"></div>
+
+      <div data-id="T25" class="seat free R4 C5"></div>
+      <div data-id="T26" class="seat free R4 C6"></div>
+      <div data-id="T27" class="seat free R5 C5"></div>
+      <div data-id="T28" class="seat free R5 C6"></div>
+
+      <div data-id="T29" class="seat free R4 C7"></div>
+      <div data-id="T30" class="seat free R4 C8"></div>
+      <div data-id="T31" class="seat free R5 C7"></div>
+      <div data-id="T32" class="seat free R5 C8"></div>
+
+      <!-- Third row of tables -->
+      <div data-id="T33" class="seat free R6 C1"></div>
+      <div data-id="T34" class="seat free R6 C2"></div>
+      <div data-id="T35" class="seat free R7 C1"></div>
+      <div data-id="T36" class="seat free R7 C2"></div>
+
+      <div data-id="T37" class="seat free R6 C3"></div>
+      <div data-id="T38" class="seat free R6 C4"></div>
+      <div data-id="T39" class="seat free R7 C3"></div>
+      <div data-id="T40" class="seat free R7 C4"></div>
+
+      <div data-id="T41" class="seat free R6 C5"></div>
+      <div data-id="T42" class="seat free R6 C6"></div>
+      <div data-id="T43" class="seat free R7 C5"></div>
+      <div data-id="T44" class="seat free R7 C6"></div>
+
+      <div data-id="T45" class="seat free R6 C7"></div>
+      <div data-id="T46" class="seat free R6 C8"></div>
+      <div data-id="T47" class="seat free R7 C7"></div>
+      <div data-id="T48" class="seat free R7 C8"></div>
+    </div>
+    
+    {% csrf_token %}
+
+    <div class="actions">
+      <input id="customer" type="text" placeholder="Your name" value="{% if user.is_authenticated %}{{ user.first_name|default:user.username }}{% endif %}" />
+      <button id="reserve">Reserve Selected</button>
+    </div>
+    <p id="msg"></p>
+  </div>
+  <script>
+    const takenSeatsData = {
+      {% for res in taken_seats %}
+        "{{ res.seat_code }}": "{{ res.customer_name }}",
+      {% endfor %}
+    };
+  </script>
+  <script src="{% static 'javascript/reserve.js' %}"></script>
+</body>
+</html>

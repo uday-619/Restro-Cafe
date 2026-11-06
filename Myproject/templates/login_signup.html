@@ -1,0 +1,113 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>la cafe' - Login & Signup</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Pacifico&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@3.4.0/fonts/remixicon.css" rel="stylesheet" />
+  <link rel="stylesheet" href="{% static 'css/login.css' %}"/>
+</head>
+<body>
+  <a href="{% url 'index' %}" class="back-home"><i class="ri-arrow-left-line"></i> Back to Home</a>
+
+  {% if messages %}
+    <div class="messages-container">
+      {% for message in messages %}
+        <div class="alert {{ message.tags }}">{{ message }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <div class="main-container {% if request.POST.action == 'signup' %}active{% endif %}">
+    <span class="bg-animate"></span>
+    <span class="bg-animate2"></span>
+
+    <!-- LOGIN FORM -->
+    <div class="form-box login">
+      <div class="brand-title animation" style="--i:0; --j:21;">la cafe'</div>
+      <form method="POST" action="{% url 'login_signup' %}">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="login" />
+        
+        <div class="input-box animation" style="--i:1; --j:22;">
+          <input type="text" name="email" required placeholder="Phone, username, or email" />
+          <i class="ri-user-line"></i>
+        </div>
+        
+        <div class="input-box animation" style="--i:2; --j:23;">
+          <input type="password" name="password" required placeholder="Password" />
+          <i class="ri-lock-line"></i>
+        </div>
+        
+        <button type="submit" class="btn animation" style="--i:3; --j:24;">Log in</button>
+        
+        <div class="reg-link animation" style="--i:4; --j:25;">
+          <p>Don't have an account? <a href="#" class="signup-link">Sign Up</a></p>
+        </div>
+      </form>
+    </div>
+
+    <div class="info-text login">
+      <h2 class="animation" style="--i:0; --j:20;">la cafe'</h2>
+      <p class="animation" style="--i:1; --j:21;">Enjoy our delicious food and drinks at Salute Bar and Cafe.</p>
+    </div>
+
+    <!-- SIGN UP FORM -->
+    <div class="form-box register">
+      <div class="brand-title animation" style="--i:17; --j:0;">la cafe'</div>
+      <form method="POST" action="{% url 'login_signup' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="signup" />
+        
+        <div class="input-box animation" style="--i:18; --j:1;">
+          <input type="text" name="fname" required placeholder="Full Name" />
+          <i class="ri-user-line"></i>
+        </div>
+
+        <div class="input-box animation" style="--i:19; --j:2;">
+          <input type="text" name="username" required placeholder="Username" />
+          <i class="ri-at-line"></i>
+        </div>
+        
+        <div class="input-box animation" style="--i:20; --j:3;">
+          <input type="email" name="email" required placeholder="Email Address" />
+          <i class="ri-mail-line"></i>
+        </div>
+
+        <div class="input-box animation" style="--i:21; --j:4;">
+          <input type="tel" name="phone_number" placeholder="Phone Number" />
+          <i class="ri-phone-line"></i>
+        </div>
+        
+        <div class="input-box animation" style="--i:22; --j:5;">
+          <input type="password" name="password" required placeholder="Password" />
+          <i class="ri-lock-line"></i>
+        </div>
+
+        <div class="input-box file-box animation" style="--i:23; --j:6;">
+          <label for="profile_picture" class="file-label">
+            <i class="ri-image-add-line"></i>
+            <span id="file-name-text">Profile Picture</span>
+          </label>
+          <input type="file" id="profile_picture" name="profile_picture" accept="image/*" style="display: none;" />
+        </div>
+        
+        <button type="submit" class="btn animation" style="--i:24; --j:7;">Sign Up</button>
+        
+        <div class="reg-link animation" style="--i:25; --j:8;">
+          <p>Already have an account? <a href="#" class="login-link">Log in</a></p>
+        </div>
+      </form>
+    </div>
+
+    <div class="info-text register">
+      <h2 class="animation" style="--i:17; --j:0;">la cafe'</h2>
+      <p class="animation" style="--i:18; --j:1;">Sign up to reserve seats and enjoy premium access.</p>
+    </div>
+  </div>
+
+  <script src="{% static 'javascript/login.js' %}"></script>
+</body>
+</html>

@@ -1,0 +1,280 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>la cafe' - Drinks Menu</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Pacifico&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@3.4.0/fonts/remixicon.css" rel="stylesheet" />
+  <link rel="stylesheet" href="{% static 'css/coffee.css' %}" />
+</head>
+<body>
+  <!-- CSRF Token for AJAX ordering -->
+  {% csrf_token %}
+
+  <!-- custom cursors -->
+  <div id="cursor"></div>
+  <div id="cursor-trail"></div>
+
+  <a href="{% url 'index' %}" class="back-home"><i class="ri-arrow-left-line"></i> Back to Home</a>
+
+  <div class="menu-container">
+    <div class="brand-header">
+      <h1 class="brand-title">la cafe'</h1>
+      <p class="subtitle">Happiness served Hot or Cold!</p>
+    </div>
+
+    <div class="menu-content-wrapper">
+      <!-- BEVERAGE LISTS -->
+      <div class="beverage-columns">
+        <!-- ▸ HOT BEVERAGES -->
+        <div class="menu-column">
+          <h2>Hot Beverages</h2>
+          <div class="drink-list">
+            {% for item in hot_beverages %}
+              <div class="drink-item" 
+                   data-id="{{ item.id }}"
+                   data-name="{{ item.name }}"
+                   data-price="${{ item.price }}"
+                   data-desc="{{ item.description }}"
+                   data-img="{% static item.image_url %}"
+                   data-avail="{% if item.is_available %}Available{% else %}Out of Stock{% endif %}">
+                <span class="drink-name">{{ item.name }}</span>
+                <span class="drink-dots"></span>
+                <span class="drink-price">Rs. {% widthratio item.price 1 40 %}</span>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- ▸ COLD BEVERAGES -->
+        <div class="menu-column">
+          <h2>Cold Beverages</h2>
+          <div class="drink-list">
+            {% for item in cold_beverages %}
+              <div class="drink-item" 
+                   data-id="{{ item.id }}"
+                   data-name="{{ item.name }}"
+                   data-price="${{ item.price }}"
+                   data-desc="{{ item.description }}"
+                   data-img="{% static item.image_url %}"
+                   data-avail="{% if item.is_available %}Available{% else %}Out of Stock{% endif %}">
+                <span class="drink-name">{{ item.name }}</span>
+                <span class="drink-dots"></span>
+                <span class="drink-price">Rs. {% widthratio item.price 1 40 %}</span>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+
+      <!-- DETAILS PANEL -->
+      <div class="details-panel-container">
+        <div class="details-card" id="details-card">
+          <div class="image-wrapper">
+            <img id="detail-img" src="{% static 'images/espresso.jpg' %}" alt="Coffee cup" />
+            <span class="availability-badge" id="detail-avail">Available</span>
+          </div>
+          <div class="card-info">
+            <h3 id="detail-name">Espresso</h3>
+            <span class="card-price" id="detail-price">$3.00</span>
+            <p class="section-title">Ingredients / Description</p>
+            <p class="ingredients-text" id="detail-desc">
+              100% Arabica dark roast espresso beans, extracted under high pressure for a thick, golden crema.
+            </p>
+            <button class="order-now-btn" id="order-now-btn" data-id="1">Order Now</button>
+            {% if user.is_staff or user.is_superuser %}
+              <button class="admin-toggle-btn" id="admin-toggle-btn" data-id="1">Toggle Availability</button>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active Orders / Order History Log -->
+    {% if user.is_authenticated and user_orders %}
+      <div class="order-history-section">
+        <h2>YOUR ORDER HISTORY</h2>
+        <div class="order-history-list">
+          {% for order in user_orders %}
+            <div class="order-history-card">
+              <span class="order-item-name">{{ order.item.name }}</span>
+              <span class="order-item-price">${{ order.item.price }}</span>
+              <span class="order-item-date">{{ order.created_at|date:"d M Y, H:i" }}</span>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
+
+    <div class="footer-note">
+      <p>Please allow us 20 minutes to serve your favourite drink.</p>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const drinkItems = document.querySelectorAll('.drink-item');
+      const detailsCard = document.getElementById('details-card');
+      const detailImg = document.getElementById('detail-img');
+      const detailAvail = document.getElementById('detail-avail');
+      const detailName = document.getElementById('detail-name');
+      const detailPrice = document.getElementById('detail-price');
+      const detailDesc = document.getElementById('detail-desc');
+      const orderNowBtn = document.getElementById('order-now-btn');
+      const adminToggleBtn = document.getElementById('admin-toggle-btn');
+
+      // Default load: Set details card to first drink item if available
+      if (drinkItems.length > 0) {
+        updateCard(drinkItems[0]);
+        detailsCard.classList.add('reveal');
+      }
+
+      // Attach mouseenter event to drink items
+      drinkItems.forEach(item => {
+        item.addEventListener('mouseenter', () => {
+          const itemId = item.getAttribute('data-id');
+          // If we hover over the already active item, do not restart animation
+          if (detailsCard.getAttribute('data-active-id') === itemId) {
+            return;
+          }
+          
+          // Remove reveal to reset animation state
+          detailsCard.classList.remove('reveal');
+          
+          // Force a browser reflow/repaint to reset CSS animations
+          void detailsCard.offsetWidth;
+          
+          // Update the card content
+          updateCard(item);
+          
+          // Add reveal class to trigger the drop-slowly animations
+          detailsCard.classList.add('reveal');
+        });
+      });
+
+      function updateCard(item) {
+        const id = item.getAttribute('data-id');
+        const name = item.getAttribute('data-name');
+        const price = item.getAttribute('data-price');
+        const desc = item.getAttribute('data-desc');
+        const img = item.getAttribute('data-img');
+        const avail = item.getAttribute('data-avail');
+
+        // Track active ID to prevent jitter on same-item hovers
+        detailsCard.setAttribute('data-active-id', id);
+
+        // Update card texts
+        detailName.textContent = name;
+        detailPrice.textContent = price;
+        detailDesc.textContent = desc;
+        detailImg.src = img;
+        
+        // Update availability badge
+        detailAvail.textContent = avail;
+        if (avail === 'Available') {
+          detailAvail.className = 'availability-badge available';
+          orderNowBtn.style.display = 'block';
+          orderNowBtn.setAttribute('data-id', id);
+        } else {
+          detailAvail.className = 'availability-badge out-of-stock';
+          orderNowBtn.style.display = 'none';
+        }
+
+        if (adminToggleBtn) {
+          adminToggleBtn.setAttribute('data-id', id);
+        }
+      }
+
+
+      // AJAX Order placement
+      orderNowBtn.addEventListener('click', () => {
+        const itemId = orderNowBtn.getAttribute('data-id');
+        const csrfTokenEl = document.querySelector('[name=csrfmiddlewaretoken]');
+        
+        if (!csrfTokenEl) {
+          alert("System security error: CSRF token not found.");
+          return;
+        }
+
+        const csrfToken = csrfTokenEl.value;
+        const formData = new FormData();
+        formData.append('item_id', itemId);
+        formData.append('csrfmiddlewaretoken', csrfToken);
+
+        fetch('/coffee/', {
+          method: 'POST',
+          body: formData
+        })
+        .then(res => {
+          if (res.status === 201) {
+            alert("Added to order successfully!");
+            location.reload();
+          } else if (res.status === 401) {
+            alert("Please log in first to order items.");
+          } else {
+            res.text().then(text => alert(text || "Failed to place order."));
+          }
+        })
+        .catch(err => {
+          alert("Network error occurred. Please try again.");
+        });
+      });
+
+      // Admin Toggle Availability AJAX
+      if (adminToggleBtn) {
+        adminToggleBtn.addEventListener('click', () => {
+          const itemId = adminToggleBtn.getAttribute('data-id');
+          const csrfTokenEl = document.querySelector('[name=csrfmiddlewaretoken]');
+          if (!csrfTokenEl) return;
+
+          const csrfToken = csrfTokenEl.value;
+          const formData = new FormData();
+          formData.append('item_id', itemId);
+          formData.append('action', 'toggle_availability');
+          formData.append('csrfmiddlewaretoken', csrfToken);
+
+          fetch('/coffee/', {
+            method: 'POST',
+            body: formData
+          })
+          .then(res => {
+            if (res.status === 200) {
+              alert("Availability updated successfully!");
+              location.reload();
+            } else {
+              res.text().then(text => alert(text || "Failed to update availability."));
+            }
+          })
+          .catch(err => {
+            alert("Network error occurred.");
+          });
+        });
+      }
+
+      /* ==== Custom blob cursor ==== */
+      const cursor = document.getElementById("cursor");
+      const trail  = document.getElementById("cursor-trail");
+      let tx = 0, ty = 0;
+
+      document.addEventListener("mousemove", e => {
+        cursor.style.left = e.clientX + "px";
+        cursor.style.top  = e.clientY + "px";
+        tx = e.clientX; ty = e.clientY;
+      });
+
+      function animateTrail(){
+        const rect = trail.getBoundingClientRect();
+        const cx = rect.left + rect.width / 2;
+        const cy = rect.top  + rect.height / 2;
+
+        trail.style.left = cx + (tx - cx) * 0.08 + "px";
+        trail.style.top  = cy + (ty - cy) * 0.08 + "px";
+        requestAnimationFrame(animateTrail);
+      }
+      animateTrail();
+    });
+  </script>
+</body>
+</html>
